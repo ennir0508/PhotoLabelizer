@@ -1,6 +1,6 @@
 # 環境構築
 
-## Python 仮想環境 ~ Windows x Scoop ~
+## Python 仮想環境 ~ Windows + Scoop ~
 
 ### 0. Python の仮想環境の作成
 
@@ -78,4 +78,33 @@ python -V
 
 ```powershell
 pip freeze
+```
+
+## 開発環境
+
+### pip ライブラリ
+
+[LAVIS - A Library for Language-Vision Intelligence](https://github.com/salesforce/LAVIS)
+
+画像のキャプション生成用
+
+```powershell
+pip install salesforce-lavis
+```
+
+[Googletrans](https://github.com/ssut/py-googletrans)
+
+キャプションの日本語対応用
+
+```powershell
+pip install googletrans==3.1.0a0
+```
+
+:warning: 特定のバージョンでない場合,以下のようなエラーになる可能性がある
+
+```log
+Traceback (most recent call last):
+    caption_ja = translator.translate(caption, src='en', dest='ja').text
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'group'
 ```

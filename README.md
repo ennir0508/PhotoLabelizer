@@ -1,42 +1,26 @@
 # PhotoLabelizer
 
-This is auto naming app for image file.
+画像ファイルの説明文を英語で生成し,そこからファイル名を自動で生成する.
+
+現状, CLIベースのツールで,毎回確認コマンドを入力しながらの変換になる.
 
 ## 環境
 
-| 対象   | バージョン    | 備考 |
-| :----- | :------------ | :--- |
-| python | python 3.11.4 |      |
-| pip    | pip 23.1.2    |      |
+| 対象   | バージョン    |
+| :----- | :------------ |
+| python | python 3.11.4 |
+| pip    | pip 23.1.2    |
 
-### pip ライブラリ
+## 使用方法
 
-[LAVIS - A Library for Language-Vision Intelligence](https://github.com/salesforce/LAVIS)
-
-画像のキャプション生成用
+### 1. 必要なライブラリのインストール
 
 ```powershell
 pip install salesforce-lavis
-```
-
-[Googletrans](https://github.com/ssut/py-googletrans)
-
-キャプションの日本語対応用
-
-```powershell
 pip install googletrans==3.1.0a0
 ```
 
-:warning: 特定のバージョンでない場合,以下のようなエラーになる可能性がある
-
-```log
-Traceback (most recent call last):
-    caption_ja = translator.translate(caption, src='en', dest='ja').text
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'NoneType' object has no attribute 'group'
-```
-
-## 使用方法
+### 2. ツールの実行
 
 src/main.py を実行する.
 
@@ -47,5 +31,21 @@ src/main.py を実行する.
 例：
 
 ```powershell
-python .\src\main.py C:\Users\xxx\Pictures\image-123456.jpg
+python .\src\main.py {ファイルパスまたはディレクトリパス}
 ```
+
+- :warning: ただし,正規表現は使用不可
+
+### 使用例:
+
+> _**海の隣の壁に座っている若い男.jpg**_
+
+![海の隣の壁に座っている若い男.jpg](./public/海の隣の壁に座っている若い男.jpg)
+
+> _**干し草畑の上の空にかかる虹.jpg**_
+
+![干し草畑の上の空にかかる虹.jpg](./public/干し草畑の上の空にかかる虹.jpg)
+
+> _**野原の植物に手を伸ばす手.jpg**_
+
+![野原の植物に手を伸ばす手.jpg](./public/野原の植物に手を伸ばす手.jpg)
