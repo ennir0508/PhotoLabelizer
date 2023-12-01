@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  client:
+    container_name: photo-labelizer
+    build:
+      context: ./client
+      dockerfile: ../docker/client.dockerfile
+    tty: true
+    environment:
+      DISPLAY: host.docker.internal:0.0
+    volumes:
+      - ./client:/usr/src/app
+    ports:
+      - 8080:1420
+    command: yarn tauri dev
+  api:
+    container_name: photo-labelizer-api
+    build:
+      context: ./api
+      dockerfile: ../docker/api.dockerfile
+    volumes:
+      - ./api:/code/app
+    ports:
+      - 80:80
