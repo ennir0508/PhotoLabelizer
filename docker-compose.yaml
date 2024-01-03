@@ -11,6 +11,7 @@ services:
       DISPLAY: host.docker.internal:0.0
     volumes:
       - ./client:/usr/src/app
+      - ./data:/root/home
     ports:
       - 8080:1420
     command: yarn tauri dev
