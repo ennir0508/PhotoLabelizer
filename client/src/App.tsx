@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import reactLogo from './assets/react.svg'
+import { ask } from '@tauri-apps/api/dialog'
 import { invoke } from '@tauri-apps/api/tauri'
 import './App.css'
 
@@ -35,6 +36,9 @@ function App (): JSX.Element {
         onSubmit={(e) => {
           e.preventDefault()
           greet()
+
+          const yes = await ask('Are you sure?', 'Tauri')
+          const yes2 = await ask('This action cannot be reverted. Are you sure?', { title: 'Tauri', type: 'warning' })
         }}
       >
         <input

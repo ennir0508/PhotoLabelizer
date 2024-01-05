@@ -88,4 +88,4 @@ sequenceDiagram
 
 ## Referencies
 
-- [【React / Next】ドラッグ&ドロップで画像を複数選択してDBにアップロードする](https://qiita.com/tak001/items/73d04d57bdcc57e81dd3)
+- [【React / Next】ドラッグ&ドロップで画像を複数選択してDBにアップロードする](https://qiita.com/hyaguchi947d/items/77f41571126c8cb9d326)
