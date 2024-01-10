@@ -10,6 +10,8 @@ RUN apt update && apt -y install task-japanese locales-all
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-RUN yarn add vite
-RUN yarn add -D @tauri-apps/cli
+COPY package.json /usr/src/app/package.json
+COPY yarn.lock /usr/src/app/yarn.lock
 RUN yarn
+
+RUN yarn add -D @tauri-apps/cli
