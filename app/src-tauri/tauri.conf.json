@@ -20,6 +20,13 @@
         "open": true,
         "save": true
       },
+      "fs": {
+        "all": true,
+        "scope": ["**"]
+      },
+      "path": {
+        "all": true
+      },
       "protocol": {
         "asset": true,
         "assetScope": ["**"]

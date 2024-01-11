@@ -9,13 +9,17 @@ import Typography from '@mui/material/Typography';
 import React from 'react';
 
 type Props = {
-  index: number
+  key: number;
+  image: string;
+  title: string;
+  selected: boolean;
 }
 
-export const PhotoListItem: React.FC<Props> = ({index}: Props) => {
+export const PhotoListItem: React.FC<Props> = ({key, image, title, selected }: Props) => {
+  
   return (
     <>
-      <Grid item key={index} xs={12} sm={6} md={4}>
+      <Grid item key={key} xs={12} sm={6} md={4}>
         <Card
           sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
         >
@@ -25,15 +29,11 @@ export const PhotoListItem: React.FC<Props> = ({index}: Props) => {
               // 16:9
               pt: '56.25%',
             }}
-            image="https://source.unsplash.com/random?wallpapers"
+            image={image || "https://source.unsplash.com/random?wallpapers"}
           />
           <CardContent sx={{ flexGrow: 1 }}>
-            <Typography gutterBottom variant="h5" component="h2">
-              Heading
-            </Typography>
-            <Typography>
-              This is a media card. You can use this section to describe the
-              content.
+            <Typography gutterBottom>
+              {title}
             </Typography>
           </CardContent>
           <CardActions>
