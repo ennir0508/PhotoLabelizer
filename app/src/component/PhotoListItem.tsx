@@ -32,7 +32,10 @@ export const PhotoListItem: React.FC<Props> = ({key, image, title, selected }: P
             image={image || "https://source.unsplash.com/random?wallpapers"}
           />
           <CardContent sx={{ flexGrow: 1 }}>
-            <Typography gutterBottom>
+            <Typography gutterBottom variant="h5" component="div" style={{ wordWrap: "break-word" }}>
+              {title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" style={{ wordWrap: "break-word" }}>
               {title}
             </Typography>
           </CardContent>

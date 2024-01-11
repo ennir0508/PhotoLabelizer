@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
-import { readDir, BaseDirectory, FileEntry } from "@tauri-apps/api/fs";
+import { open } from '@tauri-apps/api/dialog';
 import { homeDir, join } from '@tauri-apps/api/path';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 
@@ -46,12 +46,14 @@ const cards: Array<Photo> = [
   }
 ];
 
+
 function App() {
   const [cardList, setCardList] = useState<Array<Photo>>([])
 
   // 初期表示時
   useEffect(() => {
     async function initCardList() {
+      console.log("初期表示時処理");
       const homeDirPath: string = await homeDir();
       const newCardList: Array<Photo> = await Promise.all(cards.map(async (card) => {
         const imageFullPath: string = await join(homeDirPath, "/home/pictures/", card.image)
@@ -73,6 +75,23 @@ function App() {
   // useEffect(() => {
   //
   // }, [cardList])
+  
+  const handleSelectFile = async () => {
+    const pickedFilePathList = await open({
+      directory: false,
+      multiple: true,
+      defaultPath: "/root/home/pictures",
+    });
+    const pickedFileList = await Promise.all(pickedFilePathList.map((path, i)=>{
+      return {
+        index: i,
+        image: convertFileSrc(path),
+        title: path,
+        selected: false
+      }
+    }))
+    setCardList(pickedFileList)
+  }
 
   return (
     <>
@@ -93,7 +112,7 @@ function App() {
               color="text.primary"
               gutterBottom
             >
-              Album layout
+              Photo Labelizer
             </Typography>
             <Typography variant="h5" align="center" color="text.secondary" paragraph>
               Something short and leading about the collection below—its contents,
@@ -106,7 +125,7 @@ function App() {
               spacing={2}
               justifyContent="center"
             >
-              <Button variant="contained">Main call to action</Button>
+              <Button variant="contained" onClick={handleSelectFile}>Main call to action</Button>
               <Button variant="outlined">Secondary action</Button>
             </Stack>
           </Container>
