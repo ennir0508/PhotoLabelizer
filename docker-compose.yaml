@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: photo-labelizer
+    build:
+      context: ./app
+      dockerfile: ../docker/app.dockerfile
+    tty: true
+    environment:
+      - DISPLAY=host.docker.internal:0.0
+    volumes:
+      - ./app:/usr/src/app
+      - ./data/pictures:/root/home/pictures
+    ports:
+      - 8080:1420
+    command: yarn tauri dev
+    networks:
+        - tauri
+
+networks:
+  tauri:
+    driver: bridge
