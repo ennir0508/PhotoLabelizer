@@ -1,97 +1,68 @@
-import { useState, useEffect } from 'react';
+import { useState } from "react";
 
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
 
-import { open } from '@tauri-apps/api/dialog';
-import { homeDir, join } from '@tauri-apps/api/path';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { invoke, path } from "@tauri-apps/api";
+import { open } from "@tauri-apps/api/dialog";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 
-import { Footer } from "./component/Footer"
-import { Header } from "./component/Header"
-import { PhotoListItem } from './component/PhotoListItem';
+import { Footer } from "./component/Footer";
+import { Header } from "./component/Header";
+import { PhotoListItem } from "./component/PhotoListItem";
+import { getFilenameByPath } from "./helper/string";
+import { File, GetFilenameResponse, Photo, PostFilenameResponse } from "./type";
 
-type Photo = {
-  index: number;
-  image: string;
-  title: string;
-  selected: boolean;
-}
+const App = () => {
+  // 画像一覧
+  const [photoList, setPhotoList] = useState<Array<Photo>>([]);
 
-const cards: Array<Photo> = [
-  {
-    index: 1,
-    image: "dummy1.jpg",
-    title: "newimg1",
-    selected: false,
-  }, {
-    index: 2,
-    image: "dummy2.jpg",
-    title: "newimg2",
-    selected: false,
-  }, {
-    index: 3,
-    image: "dummy3.jpg",
-    title: "newimg3",
-    selected: false,
-  }, {
-    index: 4,
-    image: "dummy4.jpg",
-    title: "newimg4",
-    selected: false,
-  }
-];
-
-
-function App() {
-  const [cardList, setCardList] = useState<Array<Photo>>([])
-
-  // 初期表示時
-  useEffect(() => {
-    async function initCardList() {
-      console.log("初期表示時処理");
-      const homeDirPath: string = await homeDir();
-      const newCardList: Array<Photo> = await Promise.all(cards.map(async (card) => {
-        const imageFullPath: string = await join(homeDirPath, "/home/pictures/", card.image)
-        console.log({card, imageFullPath});
-        
-        return {
-          index: card.index,
-          image: convertFileSrc(imageFullPath),
-          title: card.title,
-          selected: false
-        } as Photo;
-      })) 
-      setCardList(newCardList)
-    }
-    initCardList()
-  }, [])
-
-  // // 画像一覧変更時
-  // useEffect(() => {
-  //
-  // }, [cardList])
-  
-  const handleSelectFile = async () => {
-    const pickedFilePathList = await open({
+  // ファイルを選択するクリック時
+  const handleSelectPhoto = async () => {
+    // ファイル選択ダイアログを表示する
+    // 選択されたファイルの絶対パスのリストを取得する
+    const filePathList = await open({
       directory: false,
       multiple: true,
       defaultPath: "/root/home/pictures",
-    });
-    const pickedFileList = await Promise.all(pickedFilePathList.map((path, i)=>{
-      return {
-        index: i,
-        image: convertFileSrc(path),
-        title: path,
-        selected: false
-      }
-    }))
-    setCardList(pickedFileList)
-  }
+    }) as string[];
+
+    setPhotoList(
+      await Promise.all(
+        filePathList?.map((path: string, i: number) => {
+          return {
+            index: i,
+            image: convertFileSrc(path),
+            title: getFilenameByPath(path),
+            path: path,
+            selected: false,
+          };
+        }) ?? [],
+      ),
+    );
+    invoke("greet");
+    invoke("get_filename_by_ai", { filePathList: filePathList })
+      .then((res: GetFilenameResponse) => {
+        console.log({ status: res.status, message: res.message });
+        res.result.map((
+          x: File,
+          index,
+        ) => console.log(`result [${index}]: ${x.path}`));
+      }).catch((e) => console.error(e));
+  };
+
+  // ファイルを選択するクリック時
+  const handleRenamePhoto = async () => {
+    const filePathList = photoList.map((o) => o.path);
+    invoke("post_filename", { filePathList: filePathList })
+      .then((res: PostFilenameResponse) => {
+        console.log({ status: res.status, message: res.message });
+      }).catch((e) => console.error(e));
+  };
 
   return (
     <>
@@ -99,7 +70,7 @@ function App() {
       <main>
         <Box
           sx={{
-            bgcolor: 'background.paper',
+            bgcolor: "background.paper",
             pt: 8,
             pb: 6,
           }}
@@ -114,10 +85,15 @@ function App() {
             >
               Photo Labelizer
             </Typography>
-            <Typography variant="h5" align="center" color="text.secondary" paragraph>
-              Something short and leading about the collection below—its contents,
-              the creator, etc. Make it short and sweet, but not too short so folks
-              don&apos;t simply skip over it entirely.
+            <Typography
+              variant="h5"
+              align="center"
+              color="text.secondary"
+              paragraph
+            >
+              Something short and leading about the collection below—its
+              contents, the creator, etc. Make it short and sweet, but not too
+              short so folks don&apos;t simply skip over it entirely.
             </Typography>
             <Stack
               sx={{ pt: 4 }}
@@ -125,22 +101,34 @@ function App() {
               spacing={2}
               justifyContent="center"
             >
-              <Button variant="contained" onClick={handleSelectFile}>Main call to action</Button>
-              <Button variant="outlined">Secondary action</Button>
+              <Button variant="contained" onClick={handleSelectPhoto}>
+                Select Photo
+              </Button>
+              <Button variant="outlined" onClick={handleRenamePhoto}>
+                Rename Photo
+              </Button>
             </Stack>
           </Container>
         </Box>
         <Container sx={{ py: 8 }} maxWidth="md">
           <Grid container spacing={4}>
-            {cardList.map(({ index, image, title, selected }) => {
-              return <PhotoListItem key={index} title={title} image={image} selected={selected} />
+            {photoList.map(({ index, image, path, title, selected }) => {
+              return (
+                <PhotoListItem
+                  index={index}
+                  title={title}
+                  path={path}
+                  image={image}
+                  selected={selected}
+                />
+              );
             })}
           </Grid>
         </Container>
       </main>
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;

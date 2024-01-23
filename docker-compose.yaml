@@ -15,3 +15,9 @@ services:
     ports:
       - 8080:1420
     command: yarn tauri dev
+    networks:
+        - tauri
+
+networks:
+  tauri:
+    driver: bridge
